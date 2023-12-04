@@ -65,25 +65,40 @@ parse_nvdsanalytics_meta_data (NvDsBatchMeta *batch_meta);
 
 GST_DEBUG_CATEGORY (NVDS_APP);
 
+/**
+ * @brief Command line options for the application.
+ *
+ * This array of GOptionEntry structures defines the command-line options
+ * available for the application. It is used by GStreamer framework for parsing
+ * the command-line arguments. Each entry specifies the option name, a short
+ * name, argument type, a pointer to a variable that is set based on the option,
+ * and a help text description.
+ */
 GOptionEntry entries[] = {
+  // Option to print the version of DeepStreamSDK
   {"version", 'v', 0, G_OPTION_ARG_NONE, &print_version,
-      "Print DeepStreamSDK version", NULL}
-  ,
+      "Print DeepStreamSDK version", NULL},
+
+  // Option to enable display of bounding box labels in tiled mode
   {"tiledtext", 't', 0, G_OPTION_ARG_NONE, &show_bbox_text,
-      "Display Bounding box labels in tiled mode", NULL}
-  ,
+      "Display Bounding box labels in tiled mode", NULL},
+
+  // Option to print the version of DeepStreamSDK and its dependencies
   {"version-all", 0, 0, G_OPTION_ARG_NONE, &print_dependencies_version,
-      "Print DeepStreamSDK and dependencies version", NULL}
-  ,
+      "Print DeepStreamSDK and dependencies version", NULL},
+
+  // Option to specify the configuration file
   {"cfg-file", 'c', 0, G_OPTION_ARG_FILENAME_ARRAY, &cfg_files,
-      "Set the config file", NULL}
-  ,
+      "Set the config file", NULL},
+
+  // Option to specify the input file
   {"input-file", 'i', 0, G_OPTION_ARG_FILENAME_ARRAY, &input_files,
-      "Set the input file", NULL}
-  ,
-  {NULL}
-  ,
+      "Set the input file", NULL},
+
+  // Array terminator
+  {NULL},
 };
+
 
 /* nvdsanalytics_src_pad_buffer_probe  will extract metadata received on nvdsanalytics
  * src pad and extract nvanalytics metadata etc. */
@@ -576,11 +591,17 @@ overlay_graphics (AppCtx * appCtx, GstBuffer * buf,
 int
 main (int argc, char *argv[])
 {
+  // A GOptionContext struct defines which options are accepted by the commandline option parser. 
+  // The struct has only private fields and should not be directly accessed.
   GOptionContext *ctx = NULL;
+
+  // A GOptionGroup struct defines the options in a single group. The struct has only private fields and should not be directly accessed.
+  // All options in a group share the same translation function. Libraries which need to parse commandline options are expected to provide a function for getting a GOptionGroup holding their options, which the application can then add to its GOptionContext.
   GOptionGroup *group = NULL;
   GError *error = NULL;
   guint i;
-
+  
+  // Initialization of command-line arguments context
   ctx = g_option_context_new ("Nvidia DeepStream Demo");
   group = g_option_group_new ("abc", NULL, NULL, NULL, NULL);
   g_option_group_add_entries (group, entries);
@@ -588,6 +609,7 @@ main (int argc, char *argv[])
   g_option_context_set_main_group (ctx, group);
   g_option_context_add_group (ctx, gst_init_get_option_group ());
 
+  // Initialize GStreamer debugging
   GST_DEBUG_CATEGORY_INIT (NVDS_APP, "NVDS_APP", 0, NULL);
 
   if (!g_option_context_parse (ctx, &argc, &argv, &error)) {
